@@ -1,0 +1,17 @@
+# Apple ModelI/O MTL File: Afx.mtl
+
+newmtl tex_u1_v1
+	map_Kd tex_u1_v1_diffuse.jpg
+	Ks 0
+	d 1
+	ao 0
+	Ns 0
+	subsurface 0
+	metallic 0
+	specularTint 0
+	roughness 0.9
+	sheen 0.05
+	sheenTint 0
+	clearCoat 0
+	clearCoatGloss 0
+
