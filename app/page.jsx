@@ -33,6 +33,7 @@ export default function Page() {
   const carouselItemsThree = [
     { component: "/images/lintulahdenaukio.png", route: '/three/lintulahdenaukio' },
     { component: "/images/trash.png", route: '/three/trash' },
+    { component: "/images/puzzle.png", route: '/three/puzzle' },
     { component: "/images/snowman.png", route: 'three/snowman' },
     { component: "/images/afx.png", route: '/three/afx' },
     { component: "/images/erzbrau.png", route: 'three/erzbrau' },
