@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useFrame, useLoader, useThree } from '@react-three/fiber'
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
@@ -9,25 +9,47 @@ import {
   BufferAttribute,
   BufferGeometry,
   MeshPhongMaterial,
+  Plane,
+  Raycaster,
   ShaderMaterial,
   SRGBColorSpace,
   TextureLoader,
+  Vector2,
   Vector3,
 } from 'three'
 
-const GRAIN_CAP = 60000 // dense enough for a small panel; the meshes carry up to 500k verts
-const FADE = 0.16 // how much of the burst is spent dissolving the surface
+const GRAIN_CAP = 70000
 
 /**
- * A sample of the mesh's vertices, each with the direction it scatters in.
- * This is what the scan looked like before it was surfaced, so the burst puts
- * it back to a point cloud rather than shattering it into debris.
- *
- * Vertices are taken on a stride rather than wholesale: these meshes run to
- * half a million points, and drawing every one of them as a sprite costs far
- * more than the grain field is worth.
+ * How each object comes apart. The scan is the same technique every time; what
+ * it is decides how it should behave when you disturb it, so a snowman sags,
+ * a bin spills, and a record sleeve shears into bands.
  */
-function buildGrains(root) {
+const SCATTER = {
+  // Geese: everything goes up and outward, the way birds leave a plinth.
+  lift: (out, local, span, v) => v.set(out.x * 0.45, 1.15 + Math.random() * 0.5, out.z * 0.45),
+  // Litter bin: tips outward and drops.
+  spill: (out, local, span, v) => v.set(out.x * 1.25, -0.75 - Math.random() * 0.5, out.z * 1.25),
+  // Snow: barely leaves, mostly sags.
+  melt: (out, local, span, v) => v.set(out.x * 0.55, -1.3 - Math.random() * 0.3, out.z * 0.55),
+  // Record sleeve: slips sideways in horizontal bands, like a mistracked scan.
+  shear: (out, local, span, v) => {
+    const band = Math.floor((local.y / span + 0.5) * 11)
+    v.set(band % 2 ? 1.4 : -1.4, (Math.random() - 0.5) * 0.15, (Math.random() - 0.5) * 0.35)
+  },
+  // Paper label: ripples off the surface along its length.
+  peel: (out, local, span, v) => {
+    const wave = Math.sin((local.z / span) * 11)
+    v.set(out.x * 0.3, 0.75 + wave * 0.6, out.z * 0.3)
+  },
+}
+
+/**
+ * A sample of the mesh's vertices, each carrying the direction it scatters in.
+ * Vertices are taken on a stride: these meshes run to half a million points and
+ * drawing every one of them as a sprite costs more than the field is worth.
+ */
+function buildGrains(root, mode, span) {
   root.updateMatrixWorld(true)
 
   const chunks = []
@@ -42,48 +64,53 @@ function buildGrains(root) {
   if (!available) return null
 
   const stride = Math.max(1, Math.ceil(available / GRAIN_CAP))
-  const total = Math.ceil(available / stride)
+  const capacity = Math.ceil(available / stride)
 
-  const positions = new Float32Array(total * 3)
-  const uvs = new Float32Array(total * 2)
-  const dirs = new Float32Array(total * 3)
-  const seeds = new Float32Array(total)
+  const positions = new Float32Array(capacity * 3)
+  const uvs = new Float32Array(capacity * 2)
+  const dirs = new Float32Array(capacity * 3)
+  const seeds = new Float32Array(capacity)
 
   const v = new Vector3()
   const centre = new Vector3()
-  let i = 0
+  let count = 0
   let seen = 0
 
   for (const chunk of chunks) {
     for (let k = 0; k < chunk.position.count; k++, seen++) {
-      if (seen % stride || i >= total) continue
+      if (seen % stride || count >= capacity) continue
       v.fromBufferAttribute(chunk.position, k).applyMatrix4(chunk.matrix)
-      positions[i * 3] = v.x
-      positions[i * 3 + 1] = v.y
-      positions[i * 3 + 2] = v.z
+      positions[count * 3] = v.x
+      positions[count * 3 + 1] = v.y
+      positions[count * 3 + 2] = v.z
       centre.add(v)
       if (chunk.uv) {
-        uvs[i * 2] = chunk.uv.getX(k)
-        uvs[i * 2 + 1] = chunk.uv.getY(k)
+        uvs[count * 2] = chunk.uv.getX(k)
+        uvs[count * 2 + 1] = chunk.uv.getY(k)
       }
-      seeds[i] = Math.random()
-      i++
+      seeds[count] = Math.random()
+      count++
     }
   }
+  if (!count) return null
+  centre.divideScalar(count)
 
-  const count = i
-  centre.divideScalar(count || 1)
+  const scatter = SCATTER[mode] || SCATTER.lift
+  const out = new Vector3()
+  const local = new Vector3()
 
-  // Scatter outward from the centre, roughened so grains do not travel in
-  // tidy radial lines.
   for (let k = 0; k < count; k++) {
-    v.set(positions[k * 3] - centre.x, positions[k * 3 + 1] - centre.y, positions[k * 3 + 2] - centre.z)
-    if (v.lengthSq() < 1e-12) v.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5)
+    local.set(positions[k * 3], positions[k * 3 + 1], positions[k * 3 + 2])
+    out.copy(local).sub(centre)
+    if (out.lengthSq() < 1e-12) out.set(Math.random() - 0.5, 0, Math.random() - 0.5)
+    out.normalize()
+
+    scatter(out, local.clone().sub(centre), span, v)
+    v.x += (Math.random() - 0.5) * 0.45
+    v.y += (Math.random() - 0.5) * 0.45
+    v.z += (Math.random() - 0.5) * 0.45
     v.normalize()
-    v.x += (Math.random() - 0.5) * 0.85
-    v.y += (Math.random() - 0.5) * 0.85 + 0.18
-    v.z += (Math.random() - 0.5) * 0.85
-    v.normalize()
+
     dirs[k * 3] = v.x
     dirs[k * 3 + 1] = v.y
     dirs[k * 3 + 2] = v.z
@@ -97,34 +124,45 @@ function buildGrains(root) {
   return geometry
 }
 
+// Only grains near the pointer are disturbed, and only those are drawn. A grain
+// at rest collapses to zero size, so the surface is never speckled with dots
+// sitting on top of it.
 const vertexShader = /* glsl */ `
   attribute vec3 aDir;
   attribute float aSeed;
-  uniform float uBurst;
+  uniform vec3 uPointer;
+  uniform float uRadius;
+  uniform float uStrength;
   uniform float uSpan;
   uniform float uSize;
   varying vec2 vUv;
+  varying float vAlpha;
 
   void main() {
     vUv = uv;
-    float travel = uBurst * uSpan * (0.05 + aSeed * 0.55);
-    vec4 mv = modelViewMatrix * vec4(position + aDir * travel, 1.0);
-    // Clamped: an unclamped sprite fills the screen as you zoom in, and the
-    // fill cost goes up with the square of its size.
-    gl_PointSize = clamp(uSize * (300.0 / max(0.001, -mv.z)), 1.0, 3.5);
+
+    float reach = 1.0 - smoothstep(uRadius * 0.12, uRadius, distance(position, uPointer));
+    float influence = reach * uStrength;
+
+    vec3 p = position + aDir * influence * uSpan * (0.06 + aSeed * 0.5);
+    vec4 mv = modelViewMatrix * vec4(p, 1.0);
+
+    vAlpha = influence;
+    gl_PointSize = influence < 0.015 ? 0.0 : clamp(uSize * (300.0 / max(0.001, -mv.z)), 1.0, 3.5);
     gl_Position = projectionMatrix * mv;
   }
 `
 
-// Opaque on purpose. Blending 80k sprites is the expensive part, and the
-// grains sit exactly on the surface they replace, so nothing needs to fade.
 const fragmentShader = /* glsl */ `
   precision mediump float;
   uniform sampler2D uMap;
   varying vec2 vUv;
+  varying float vAlpha;
 
   void main() {
-    gl_FragColor = texture2D(uMap, vUv);
+    if (vAlpha < 0.02) discard;
+    vec4 texel = texture2D(uMap, vUv);
+    gl_FragColor = vec4(texel.rgb, vAlpha);
     #include <tonemapping_fragment>
     #include <colorspace_fragment>
   }
@@ -136,19 +174,19 @@ const fragmentShader = /* glsl */ `
  * origin, so the mesh is measured and normalised here, then sized against the
  * tighter side of the viewport.
  */
-export function Scan({ name, fill = 0.74, burst = false, ...props }) {
+export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
   const materials = useLoader(MTLLoader, `/${name}/${name}.mtl`)
   const obj = useLoader(OBJLoader, `/${name}/${name}.obj`)
   const diffuseMap = useLoader(TextureLoader, `/${name}/tex_u1_v1_diffuse.jpg`)
   const normalMap = useLoader(TextureLoader, `/${name}/tex_u1_v1_normal.jpg`)
   const camera = useThree((state) => state.camera)
   const size = useThree((state) => state.size)
-  const surface = useRef(null)
-  const progress = useRef(0)
+  const grainNode = useRef(null)
 
   useEffect(() => {
     materials?.preload()
     diffuseMap.colorSpace = SRGBColorSpace
+    diffuseMap.needsUpdate = true
   }, [materials, diffuseMap])
 
   const { model, offset, unit, span } = useMemo(() => {
@@ -164,64 +202,73 @@ export function Scan({ name, fill = 0.74, burst = false, ...props }) {
     const extent = box.getSize(new Vector3())
     const centre = box.getCenter(new Vector3())
     const longest = Math.max(extent.x, extent.y, extent.z)
+    const safe = Number.isFinite(longest) && longest > 0 ? longest : 1
 
     return {
       model: clone,
       offset: Number.isFinite(centre.x) ? [-centre.x, -centre.y, -centre.z] : [0, 0, 0],
-      unit: Number.isFinite(longest) && longest > 0 ? 1 / longest : 1,
-      span: Number.isFinite(longest) && longest > 0 ? longest : 1,
+      unit: 1 / safe,
+      span: safe,
     }
   }, [obj, materials, diffuseMap, normalMap])
 
-  // Built on the first click, not on load: most visitors never scatter it, and
-  // the buffers are wasted memory until they do.
-  const [grains, setGrains] = useState(null)
-  useEffect(() => {
-    setGrains(null)
-  }, [model])
-  useEffect(() => {
-    if (burst) setGrains((existing) => existing ?? buildGrains(model))
-  }, [burst, model])
+  const grains = useMemo(() => buildGrains(model, mode, span), [model, mode, span])
 
-  const grainMaterial = useMemo(
+  const material = useMemo(
     () =>
       new ShaderMaterial({
         uniforms: {
           uMap: { value: diffuseMap },
-          uBurst: { value: 0 },
+          uPointer: { value: new Vector3(0, 0, 0) },
+          uRadius: { value: span * 0.3 },
+          uStrength: { value: 0 },
           uSpan: { value: span },
-          uSize: { value: 1.6 },
+          uSize: { value: 1.7 },
         },
         vertexShader,
         fragmentShader,
+        transparent: true,
+        depthWrite: false,
       }),
     [diffuseMap, span],
   )
 
-  useEffect(() => () => grainMaterial.dispose(), [grainMaterial])
+  useEffect(() => () => material.dispose(), [material])
   useEffect(() => () => grains?.dispose(), [grains])
 
+  const rig = useMemo(
+    () => ({
+      ray: new Raycaster(),
+      plane: new Plane(),
+      normal: new Vector3(),
+      origin: new Vector3(),
+      hit: new Vector3(),
+      ndc: new Vector2(),
+      settled: new Vector3(),
+    }),
+    [],
+  )
+
   useFrame((_, delta) => {
-    const target = burst ? 1 : 0
-    if (progress.current === target) return
+    const node = grainNode.current
+    if (!node || !pointer) return
 
-    const step = Math.min(1, delta * (burst ? 2.4 : 3.4))
-    progress.current += (target - progress.current) * step
-    if (Math.abs(target - progress.current) < 0.002) progress.current = target
+    const { active, x, y } = pointer.current
+    const step = Math.min(1, delta * 6)
+    material.uniforms.uStrength.value += ((active ? 1 : 0) - material.uniforms.uStrength.value) * step
 
-    const t = progress.current
-    grainMaterial.uniforms.uBurst.value = t * t * (3 - 2 * t)
-
-    // The surface fades out over the first sliver of the burst, while the
-    // grains are still sitting exactly where its vertices were.
-    const dissolve = Math.min(1, t / FADE)
-    if (surface.current) {
-      surface.current.visible = dissolve < 1
-      surface.current.traverse((child) => {
-        if (!child.isMesh) return
-        child.material.transparent = dissolve > 0 && dissolve < 1
-        child.material.opacity = 1 - dissolve
-      })
+    if (active) {
+      // Where the cursor lands on a plane through the object, facing the camera.
+      rig.ndc.set(x, y)
+      rig.ray.setFromCamera(rig.ndc, camera)
+      camera.getWorldDirection(rig.normal)
+      node.getWorldPosition(rig.origin)
+      rig.plane.setFromNormalAndCoplanarPoint(rig.normal.negate(), rig.origin)
+      if (rig.ray.ray.intersectPlane(rig.plane, rig.hit)) {
+        node.worldToLocal(rig.hit)
+        rig.settled.lerp(rig.hit, Math.min(1, delta * 14))
+        material.uniforms.uPointer.value.copy(rig.settled)
+      }
     }
   })
 
@@ -234,10 +281,10 @@ export function Scan({ name, fill = 0.74, burst = false, ...props }) {
 
   return (
     <group scale={scale} {...props}>
-      <group ref={surface} position={offset}>
+      <group position={offset}>
         <primitive object={model} />
       </group>
-      {grains && <points geometry={grains} material={grainMaterial} position={offset} />}
+      {grains && <points ref={grainNode} geometry={grains} material={material} position={offset} />}
     </group>
   )
 }

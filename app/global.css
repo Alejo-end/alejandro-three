@@ -138,9 +138,18 @@
     width: var(--cord-w);
   }
 
+  /* A message cord is thinner and uncoloured, but it carries signal too, so it
+     runs with the same rhythm as the other two. */
   .cord-run[data-cord='data'] {
-    width: 1.5px;
-    background: var(--data);
+    width: 3px;
+    background-color: var(--data);
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 11px,
+      var(--canvas) 11px 13px
+    );
+    background-size: 100% 24px;
+    animation: cord-flow-data 7s linear infinite;
   }
 
   .cord-run[data-cord='audio'],
@@ -164,8 +173,15 @@
 
   /* The short horizontal run from the rail into a section's inlet. */
   .cord-tick[data-cord='data'] {
-    height: 1.5px;
-    background: var(--data);
+    height: 3px;
+    background-color: var(--data);
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0 11px,
+      var(--canvas) 11px 13px
+    );
+    background-size: 24px 100%;
+    animation: cord-flow-data-x 7s linear infinite;
   }
 
   .cord-tick[data-cord='audio'],
@@ -197,6 +213,18 @@
   @keyframes cord-flow-x {
     to {
       background-position-x: 20px;
+    }
+  }
+
+  @keyframes cord-flow-data {
+    to {
+      background-position-y: 24px;
+    }
+  }
+
+  @keyframes cord-flow-data-x {
+    to {
+      background-position-x: 24px;
     }
   }
 

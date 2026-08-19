@@ -14,7 +14,7 @@ export default function Page() {
       ]}
       lead={'A beer label taken off a bottle and flattened out. There is almost no depth to it, so most of the detail is in the texture rather than the mesh.'}
     >
-      <ScanViewer name='Erzbrau' />
+      <ScanViewer name='Erzbrau' mode='peel' />
     </ExhibitPage>
   )
 }

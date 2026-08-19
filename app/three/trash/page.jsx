@@ -14,7 +14,7 @@ export default function Page() {
       ]}
       lead={'A street litter bin, scanned along with the pavement and the fence behind it. The ribbed metal gives photogrammetry plenty to match on.'}
     >
-      <ScanViewer name='Trash_Can' />
+      <ScanViewer name='Trash_Can' mode='spill' />
     </ExhibitPage>
   )
 }

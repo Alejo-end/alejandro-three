@@ -14,7 +14,7 @@ export default function Page() {
       ]}
       lead={'The vinyl box set, scanned at home on a desk. Matte board and a debossed logo, both low in contrast.'}
     >
-      <ScanViewer name='Afx' rotation={[0, Math.PI, 0]} />
+      <ScanViewer name='Afx' rotation={[0, Math.PI, 0]} mode='shear' />
     </ExhibitPage>
   )
 }

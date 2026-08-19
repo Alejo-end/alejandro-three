@@ -15,7 +15,7 @@ export default function Page() {
       ]}
       lead={'Made by someone in Karhupuisto over New Year and scanned before it melted. Snow is a hard subject — white and featureless — so parts of the surface are approximate.'}
     >
-      <ScanViewer name='Snowman' />
+      <ScanViewer name='Snowman' mode='melt' />
     </ExhibitPage>
   )
 }
