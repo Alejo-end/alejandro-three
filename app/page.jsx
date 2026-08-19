@@ -4,8 +4,8 @@ import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 import { Carousel } from '../src/components/Carousel'
 import { Card } from '../src/components/ui/card'
-import { Link } from 'next/link'
 import { ExternalLinkIcon } from 'lucide-react'
+import { audioReactiveP5Overlay, cameraFeedbackKaleid } from '@/data/liveCoding'
 
 
 const PersonStandingIcon = () => import('lucide-react').then((mod) => mod.PersonStandingIcon)
@@ -34,12 +34,13 @@ export default function Page() {
     { component: "/images/lintulahdenaukio.png", route: '/three/lintulahdenaukio' },
     { component: "/images/trash.png", route: '/three/trash' },
     { component: "/images/puzzle.png", route: '/three/puzzle' },
-    { component: "/images/snowman.png", route: 'three/snowman' },
+    { component: "/images/snowman.png", route: '/three/snowman' },
     { component: "/images/afx.png", route: '/three/afx' },
-    { component: "/images/erzbrau.png", route: 'three/erzbrau' },
+    { component: "/images/erzbrau.png", route: '/three/erzbrau' },
   ]
   const carouselItemsLiveCoding = [
-    { component: "/images/hydra.png", route: 'https://hydra.ojack.xyz/?code=JTJGJTJGQWxlamFuZHJvJTNGJTBBYnBtJTIwJTNEJTIwMTIwJTBBJTBBczAuaW5pdENhbSgpJTBBczEuaW5pdFNjcmVlbigpJTBBc3JjKHMxKS5vdXQobzApJTBBc3JjKHMwKS5vdXQobzIpJTBBJTBBc3JjKG8wKS5tb2R1bGF0ZShub2lzZSgzJTJDMSklMkMlMjAwLjIpJTBBJTIwJTIwLnNoaWZ0KDAuOSUyQzAuMSUyQzAuMyklMEElMjAlMjAub3V0KG8xKSUwQXNyYyhvMCkubW9kdWxhdGUobzElMkMlMjAwLjIpLm91dChvMiklMEFzcmMobzIpLm1vZHVsYXRlKG8yJTJDJTIwMC4yKS5rYWxlaWQoNSkub3V0KG8zKSUwQXZvcm9ub2koNCUyQzAuNSUyQzAuNCklMEElMjAlMjAucGl4ZWxhdGUoMjAlMkMyMCklMEElMjAlMjAubW9kdWxhdGUobzIlMkMlMjAwLjEpJTBBJTIwJTIwLnNoaWZ0KDAuMSUyQzAuNCUyQzAuMyklMEElMjAlMjAub3V0KG8xKSUwQXJlbmRlcihvMiklMEElMEElMkYlMkZzcmMoczApLm1vZHVsYXRlKG8zKS5vdXQoKQ%3D%3D', external: true },
+    { component: "/images/hydra.png", route: cameraFeedbackKaleid, external: true },
+    { component: "/images/hydra2.png", route: audioReactiveP5Overlay, external: true },
   ]
   const carouselItemsMaxMSP = [
     { component: "/images/audiovisualizer.png", route: 'https://alejandro-p5-rnbo.vercel.app/sketches/mouse-theremin', external: true },
