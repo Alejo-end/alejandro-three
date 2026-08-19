@@ -1,100 +1,87 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
-import { Carousel } from '../src/components/Carousel'
-import { Card } from '../src/components/ui/card'
-import { ExternalLinkIcon } from 'lucide-react'
-import { audioReactiveP5Overlay, cameraFeedbackKaleid } from '@/data/liveCoding'
+import { Suspense, useState } from 'react'
+import { CordKey, Outlet } from '@/components/site/Cords'
+import { Section } from '@/components/site/Section'
+import { SiteHeader } from '@/components/site/SiteHeader'
+import { SiteFooter } from '@/components/site/SiteFooter'
+import { geometry, sections } from '@/data/works'
 
-
-const PersonStandingIcon = () => import('lucide-react').then((mod) => mod.PersonStandingIcon)
-const GitCommitIcon = () => import('lucide-react').then((mod) => mod.GitCommitIcon)
-
-const Logo = dynamic(() => import('@/components/Examples').then((mod) => mod.Logo), { ssr: false })
-const View = dynamic(() => import('@/components/View').then((mod) => mod.View), {
-  ssr: false,
-  loading: () => (
-    <div className='flex h-96 w-full flex-col items-center justify-center'>
-      <svg className='-ml-1 mr-3 size-5 animate-spin text-black' fill='none' viewBox='0 0 24 24'>
-        <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
-        <path
-          className='opacity-75'
-          fill='currentColor'
-          d='M4 12a8 8 0 0 1 8-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 0 1 4 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-        />
-      </svg>
-    </div>
-  ),
-})
+const View = dynamic(() => import('@/components/View').then((mod) => mod.View), { ssr: false })
 const Common = dynamic(() => import('@/components/View').then((mod) => mod.Common), { ssr: false })
+const PointScan = dynamic(() => import('@/components/canvas/PointScan').then((mod) => mod.PointScan), { ssr: false })
+
+// The hero re-scans the captures themselves, so the switcher doubles as a
+// preview of what is further down the page.
+const SOURCES = geometry.filter((item) => !item.bleed)
 
 export default function Page() {
-  const carouselItemsThree = [
-    { component: "/images/lintulahdenaukio.png", route: '/three/lintulahdenaukio' },
-    { component: "/images/trash.png", route: '/three/trash' },
-    { component: "/images/puzzle.png", route: '/three/puzzle' },
-    { component: "/images/snowman.png", route: '/three/snowman' },
-    { component: "/images/afx.png", route: '/three/afx' },
-    { component: "/images/erzbrau.png", route: '/three/erzbrau' },
-  ]
-  const carouselItemsLiveCoding = [
-    { component: "/images/hydra.png", route: cameraFeedbackKaleid, external: true },
-    { component: "/images/hydra2.png", route: audioReactiveP5Overlay, external: true },
-  ]
-  const carouselItemsMaxMSP = [
-    { component: "/images/audiovisualizer.png", route: 'https://alejandro-p5-rnbo.vercel.app/sketches/mouse-theremin', external: true },
-    { component: "/images/ambient-generator.png", route: 'https://alejandro-p5-rnbo.vercel.app/sketches/ambient-generator', external: true },
-    { component: "/images/piano.png", route: 'https://alejandro-p5-rnbo.vercel.app/sketches/piano-sketch', external: true },
-  ]
+  const [source, setSource] = useState(SOURCES[0])
+
   return (
     <>
-      <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
-        {/* jumbo */}
-        <div className='flex w-full flex-col items-start justify-center p-12 text-center md:w-2/5 md:text-left'>
-          <p className='w-full uppercase'>Hey there!</p>
-          <h1 className='my-4 text-5xl font-bold leading-tight'>Welcome to Alejandro? Portfolio</h1>
-          <p className='mb-8 text-2xl leading-normal'>A small website for hobbies, art and sound experimentation.</p>
+      <SiteHeader />
+
+      <main className='mx-auto max-w-patch px-6 md:px-10'>
+        <div className='grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:items-center lg:gap-0'>
+          <div className='relative md:pl-rail'>
+            <p className='t-mono mb-7 uppercase tracking-[0.2em] text-muted'>Captures, patches, live code</p>
+
+            <h1 className='t-display text-[2.6rem] sm:text-[3.3rem] xl:text-[3.8rem]'>
+              Everything here was captured from somewhere else.
+            </h1>
+
+            <p className='t-body mt-7 max-w-[34rem] text-muted'>
+              A public bin and a snowman off the street in Helsinki. A beer label from Austria. A camera feed folded
+              back through itself, a microphone wired into a Max patch. All of it left running in the browser.
+            </p>
+
+            <div className='mt-9 max-w-[34rem] border-t border-rule pt-5'>
+              <CordKey />
+            </div>
+          </div>
+
+          {/* The cloud bleeds left, under the type: the canvas layer sits below the content. */}
+          <figure className='relative lg:-ml-[24%] lg:-mr-[4%]'>
+            <View className='pointer-events-none h-[42vh] max-h-[34rem] min-h-[17rem] w-full lg:h-[32rem]'>
+              <Suspense fallback={null}>
+                <PointScan src={source.image} />
+                <Common />
+              </Suspense>
+            </View>
+
+            <figcaption className='relative mt-1 flex flex-wrap items-center justify-end gap-x-3 gap-y-2'>
+              <span className='t-mono uppercase tracking-[0.14em] text-muted'>Re-scanned</span>
+              {SOURCES.map((item) => (
+                <button
+                  key={item.slug}
+                  type='button'
+                  onClick={() => setSource(item)}
+                  aria-pressed={item.slug === source.slug}
+                  className={`t-mono uppercase tracking-[0.12em] underline-offset-[5px] transition-colors ${
+                    item.slug === source.slug
+                      ? 'text-ink underline decoration-audio decoration-2'
+                      : 'text-muted hover:text-ink'
+                  }`}
+                >
+                  {item.slug}
+                </button>
+              ))}
+            </figcaption>
+          </figure>
         </div>
 
-        <div className='w-full text-center md:w-3/5'>
-          <View className='flex h-96 w-full flex-col items-center justify-center'>
-            <Suspense fallback={null}>
-              <Logo route='/blob' scale={0.6} position={[0, 0, 0]} />
-              <Common />
-            </Suspense>
-          </View>
-        </div>
-      </div>
+        <Outlet />
+        {/* The rail is hidden on small screens, so the sections need their own gap. */}
+        <div aria-hidden className='h-12 md:hidden' />
 
-      <div className='mx-auto flex w-full flex-col flex-wrap items-center p-12 md:flex-row  lg:w-4/5'>
+        {sections.map((section, index) => (
+          <Section key={section.id} section={section} carries={sections.slice(index).map((s) => s.cord)} />
+        ))}
+      </main>
 
-        <Card className="my-6 w-full p-6">
-          <h1 className="mb-1 text-xl font-bold sm:text-3xl">Three.js + RealityScan</h1>
-          <p className="mb-6 text-sm font-light sm:text-xl">A tiny collection of 3D models and experiments with Three.js and RealityScan. It may take a few seconds to load each model.</p>
-          <Carousel items={carouselItemsThree} />
-        </Card>
-
-
-        <Card className="my-6 w-full p-6">
-          <h1 className="mb-1 text-xl font-bold sm:text-3xl">MaxMSP + P5.js + RNBO</h1>
-          <p className="mb-1 text-sm font-light sm:text-xl">A couple of experiments with P5.js and RNBO. MaxMSP on the web.</p>
-          <a href="https://alejandro-p5-rnbo.vercel.app/" className='mb-6 flex items-center gap-2 text-gray-500 hover:text-gray-800'>Visit my p5 + rnbo sketches website <ExternalLinkIcon /></a>
-          <Carousel items={carouselItemsMaxMSP} />
-        </Card>
-
-        <Card className="my-6 w-full p-6">
-          <h1 className="mb-1 text-xl font-bold sm:text-3xl">Live Coding</h1>
-          <p className="mb-6 text-sm font-light sm:text-xl">A couple of scripts for Hydra Video Synth. some scripts may require access to the camera or to another window with videos to work.</p>
-          <Carousel items={carouselItemsLiveCoding} />
-        </Card>
-
-
-      </div>
-      <footer className='flex w-full flex-col items-center justify-center p-12 text-center'>
-        <p className='text-gray-600'>Made by<a href="https://alejandro-prtfl.vercel.app/" className='text-gray-500 hover:text-gray-800'> Alejandro?</a></p>
-
-      </footer>
+      <SiteFooter />
     </>
   )
 }

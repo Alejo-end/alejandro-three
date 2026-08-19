@@ -3,6 +3,24 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* Patcher canvas. Cool sage neutral — the gray a scan gets rendered into. */
+    --canvas: #d7d9d1;
+    --paper: #ecede7;
+    --ink: #14171a;
+    --muted: #545a53;
+    --rule: #b4b8ad;
+
+    /* Cord colours, straight out of Max: audio cords are yellow, Jitter's
+       matrix cords are green, and message/data cords are thin black. */
+    --audio: #e8b106;
+    --matrix: #3e8e3c;
+    --data: #14171a;
+
+    --rail: 5.5rem;
+    --cord-w: 5px;
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -16,66 +34,190 @@
     padding: 0;
     overflow: hidden;
   }
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+
+  html {
+    background: var(--canvas);
   }
-  .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+
+  body {
+    color: var(--ink);
+    font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+    font-variation-settings: 'wdth' 100;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--audio);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer components {
+  /* ---- type roles -------------------------------------------------- */
+
+  /* Expanded grotesque. Reads like equipment silkscreen. */
+  .t-display {
+    font-family: var(--font-archivo), ui-sans-serif, sans-serif;
+    font-variation-settings: 'wdth' 122;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 0.94;
+    text-wrap: balance;
   }
-  body {
-    @apply bg-background text-foreground;
+
+  .t-heading {
+    font-family: var(--font-archivo), ui-sans-serif, sans-serif;
+    font-variation-settings: 'wdth' 118;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1;
+  }
+
+  .t-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+
+  .t-body {
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+    max-width: 62ch;
+  }
+
+  /* ---- cords ------------------------------------------------------- */
+  /* A Max audio cord is a coloured line overprinted with black dashes.
+     Vertical runs are gradients so they stretch to any section height. */
+
+  .cord-run {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: var(--cord-w);
+  }
+
+  .cord-run[data-cord='data'] {
+    width: 1.5px;
+    background: var(--data);
+  }
+
+  .cord-run[data-cord='audio'],
+  .cord-run[data-cord='matrix'] {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0 7px,
+      var(--ink) 7px 10px
+    );
+    background-size: 100% 20px;
+    animation: cord-flow 6s linear infinite;
+  }
+
+  .cord-run[data-cord='audio'] {
+    background-color: var(--audio);
+  }
+
+  .cord-run[data-cord='matrix'] {
+    background-color: var(--matrix);
+  }
+
+  /* The short horizontal run from the rail into a section's inlet. */
+  .cord-tick[data-cord='data'] {
+    height: 1.5px;
+    background: var(--data);
+  }
+
+  .cord-tick[data-cord='audio'],
+  .cord-tick[data-cord='matrix'] {
+    height: var(--cord-w);
+    background-image: repeating-linear-gradient(
+      to right,
+      transparent 0 7px,
+      var(--ink) 7px 10px
+    );
+    background-size: 20px 100%;
+    animation: cord-flow-x 6s linear infinite;
+  }
+
+  .cord-tick[data-cord='audio'] {
+    background-color: var(--audio);
+  }
+
+  .cord-tick[data-cord='matrix'] {
+    background-color: var(--matrix);
+  }
+
+  @keyframes cord-flow {
+    to {
+      background-position-y: 20px;
+    }
+  }
+
+  @keyframes cord-flow-x {
+    to {
+      background-position-x: 20px;
+    }
+  }
+
+  /* An inlet/outlet nub, the way Max draws them. */
+  .nub {
+    width: 13px;
+    height: 5px;
+    background: var(--ink);
+  }
+
+  /* A mesh arrives as one 100 MB file, so item counts sit at 0% for a minute.
+     Show an honest indeterminate run instead of a percentage that lies. */
+  .loading-run {
+    position: relative;
+    overflow: hidden;
+    height: 1.5px;
+    background: var(--rule);
+  }
+
+  .loading-run::after {
+    content: '';
+    position: absolute;
+    inset-block: 0;
+    width: 34%;
+    background: var(--ink);
+    animation: load-sweep 1.6s ease-in-out infinite;
+  }
+
+  @keyframes load-sweep {
+    from {
+      left: -34%;
+    }
+    to {
+      left: 100%;
+    }
+  }
+
+  /* ---- surfaces ---------------------------------------------------- */
+
+  .framed {
+    border: 1.5px solid var(--ink);
+    background: var(--ink);
+  }
+
+  .rule {
+    border-color: var(--rule);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
   }
 }

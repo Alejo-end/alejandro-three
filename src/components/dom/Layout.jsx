@@ -12,13 +12,15 @@ const Layout = ({ children }) => {
       ref={ref}
       style={{
         position: 'relative',
-        width: ' 100%',
+        width: '100%',
         height: '100%',
         overflow: 'auto',
         touchAction: 'auto',
       }}
     >
-      {children}
+      {/* One layer above the canvas, so type can cross a scan without the
+          points printing over the letterforms. */}
+      <div style={{ position: 'relative', zIndex: 1 }}>{children}</div>
       <Scene
         style={{
           position: 'fixed',
@@ -27,6 +29,7 @@ const Layout = ({ children }) => {
           width: '100vw',
           height: '100vh',
           pointerEvents: 'none',
+          zIndex: 0,
         }}
         eventSource={ref}
         eventPrefix='client'
