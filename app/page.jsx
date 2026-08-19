@@ -12,8 +12,8 @@ const View = dynamic(() => import('@/components/View').then((mod) => mod.View), 
 const Common = dynamic(() => import('@/components/View').then((mod) => mod.Common), { ssr: false })
 const PointScan = dynamic(() => import('@/components/canvas/PointScan').then((mod) => mod.PointScan), { ssr: false })
 
-// The hero re-scans the captures themselves, so the switcher doubles as a
-// preview of what is further down the page.
+// The hero rebuilds one of the scans below, so the switcher doubles as a
+// preview of the Objects section.
 const SOURCES = geometry.filter((item) => !item.bleed)
 
 export default function Page() {
@@ -26,15 +26,15 @@ export default function Page() {
       <main className='mx-auto max-w-patch px-6 md:px-10'>
         <div className='grid gap-6 lg:grid-cols-[minmax(0,1.12fr)_minmax(0,1fr)] lg:items-center lg:gap-0'>
           <div className='relative md:pl-rail'>
-            <p className='t-mono mb-7 uppercase tracking-[0.2em] text-muted'>Captures, patches, live code</p>
+            <p className='t-label mb-7 text-muted'>Captures, patches, live code</p>
 
-            <h1 className='t-display text-[2.6rem] sm:text-[3.3rem] xl:text-[3.8rem]'>
-              Everything here was captured from somewhere else.
+            <h1 className='t-display'>
+              Things I scanned, patches I built, code I left running.
             </h1>
 
             <p className='t-body mt-7 max-w-[34rem] text-muted'>
-              A public bin and a snowman off the street in Helsinki. A beer label from Austria. A camera feed folded
-              back through itself, a microphone wired into a Max patch. All of it left running in the browser.
+              Photogrammetry scans of objects from Helsinki and Austria, Max patches running in the browser through
+              RNBO, and Hydra scripts you can open and edit. Everything here is clickable.
             </p>
 
             <div className='mt-9 max-w-[34rem] border-t border-rule pt-5'>
@@ -52,14 +52,14 @@ export default function Page() {
             </View>
 
             <figcaption className='relative mt-1 flex flex-wrap items-center justify-end gap-x-3 gap-y-2'>
-              <span className='t-mono uppercase tracking-[0.14em] text-muted'>Re-scanned</span>
+              <span className='t-label text-muted'>Re-scanned</span>
               {SOURCES.map((item) => (
                 <button
                   key={item.slug}
                   type='button'
                   onClick={() => setSource(item)}
                   aria-pressed={item.slug === source.slug}
-                  className={`t-mono uppercase tracking-[0.12em] underline-offset-[5px] transition-colors ${
+                  className={`t-label underline-offset-[5px] transition-colors ${
                     item.slug === source.slug
                       ? 'text-ink underline decoration-audio decoration-2'
                       : 'text-muted hover:text-ink'

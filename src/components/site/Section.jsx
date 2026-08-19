@@ -7,12 +7,12 @@ export function Section({ section, carries }) {
   const { id, cord, cordLabel, title, count, lead, items, link } = section
 
   return (
-    <section aria-labelledby={`${id}-title`} className='relative pb-24 pt-2 md:pl-rail'>
+    <section aria-labelledby={`${id}-title`} className='relative pb-28 pt-2 md:pl-rail'>
       <CordRuns carries={carries} terminates={cord} />
       <Inlet cord={cord} />
 
       <header className='border-t-[1.5px] border-ink pt-4'>
-        <div className='t-mono mb-7 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 uppercase tracking-[0.14em] text-muted'>
+        <div className='t-label mb-7 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-muted'>
           <span className='flex items-center gap-4 text-ink'>
             <CordStub cord={cord} />
             {cordLabel}
@@ -20,7 +20,7 @@ export function Section({ section, carries }) {
           <span>{count}</span>
         </div>
 
-        <h2 id={`${id}-title`} className='t-heading text-[2.6rem] sm:text-[3.4rem]'>
+        <h2 id={`${id}-title`} className='t-title'>
           {title}
         </h2>
         <p className='t-body mt-4 text-muted'>{lead}</p>
@@ -28,7 +28,7 @@ export function Section({ section, carries }) {
         {link && (
           <a
             href={link.href}
-            className='t-mono mt-5 inline-flex items-center gap-1.5 uppercase tracking-[0.14em] text-ink underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-audio'
+            className='t-label mt-5 inline-flex items-center gap-1.5 text-ink underline decoration-rule decoration-2 underline-offset-[6px] transition-colors hover:decoration-audio'
           >
             {link.label}
             <ArrowUpRight aria-hidden size={13} strokeWidth={2.5} />
@@ -36,7 +36,7 @@ export function Section({ section, carries }) {
         )}
       </header>
 
-      <ul className='mt-12 grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3'>
+      <ul className='mt-14 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3'>
         {items.map((item) => (
           <Piece key={item.slug} item={item} />
         ))}

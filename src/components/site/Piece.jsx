@@ -2,10 +2,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 
-/**
- * One piece. Cut-out objects float straight on the page; anything that fills
- * its own frame stays a framed screen. Objects float, screens are framed.
- */
+/** One piece. Cut-out objects sit straight on the page; anything that fills its
+    own frame gets a border. Objects float, screens are framed. */
 export function Piece({ item }) {
   const { title, meta, tag, image, route, external, bleed, blurb } = item
 
@@ -36,13 +34,13 @@ export function Piece({ item }) {
         </div>
 
         <div className='mt-4 flex items-baseline justify-between gap-3 border-t border-rule pt-3'>
-          <h3 className='t-heading text-lg'>
+          <h3 className='t-sub'>
             <span className='bg-gradient-to-r from-audio to-audio bg-[length:0%_0.3em] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover:bg-[length:100%_0.3em] group-focus-visible:bg-[length:100%_0.3em]'>
               {title}
             </span>
           </h3>
           {/* Only appears when it says something the section header doesn't. */}
-          {tag && <span className='t-mono shrink-0 uppercase tracking-[0.12em] text-muted'>{tag}</span>}
+          {tag && <span className='t-label shrink-0 text-muted'>{tag}</span>}
           {external && route && !tag && (
             <ArrowUpRight
               aria-hidden
@@ -53,8 +51,8 @@ export function Piece({ item }) {
           )}
         </div>
 
-        <p className='t-mono mt-2 uppercase tracking-[0.12em] text-muted'>{meta}</p>
-        <p className='mt-3 text-[0.9375rem] leading-relaxed text-muted'>{blurb}</p>
+        <p className='t-label mt-2 text-muted'>{meta}</p>
+        <p className='t-note mt-3 text-muted'>{blurb}</p>
       </Anchor>
     </li>
   )

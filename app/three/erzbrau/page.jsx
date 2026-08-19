@@ -1,10 +1,7 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { ExhibitPage } from '@/components/site/ExhibitPage'
 import { ScanViewer } from '@/components/site/ScanViewer'
-
-const Scan = dynamic(() => import('@/components/canvas/Scan').then((mod) => mod.Scan), { ssr: false })
 
 export default function Page() {
   return (
@@ -15,12 +12,10 @@ export default function Page() {
         ['Method', 'RealityScan'],
         ['Mesh', 'OBJ + MTL, 24 MB'],
       ]}
-      lead={'A beer label peeled off a bottle and flattened out. Thin, creased and barely there as geometry — which makes the creases the only thing holding the reconstruction together.'}
-      note='Drag to turn it · scroll to zoom · two fingers to pan'
+      lead={'A beer label taken off a bottle and flattened out. There is almost no depth to it, so most of the detail is in the texture rather than the mesh.'}
+      note='Drag to rotate · scroll to zoom · two fingers to pan'
     >
-      <ScanViewer>
-        <Scan name='Erzbrau' />
-      </ScanViewer>
+      <ScanViewer name='Erzbrau' />
     </ExhibitPage>
   )
 }

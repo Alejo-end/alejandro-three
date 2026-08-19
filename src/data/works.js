@@ -1,8 +1,8 @@
 import { audioReactiveP5Overlay, bassGatedScenes, cameraFeedbackKaleid } from './liveCoding'
 
 // Every piece on the site, grouped by the kind of signal its cord carries.
-// `bleed` marks a thumbnail that fills its own frame (a screen); everything else
-// is a cut-out that floats straight on the page (an object).
+// `bleed` marks a thumbnail that fills its own frame (a screen); everything
+// else is a cut-out that sits straight on the page (an object).
 
 export const geometry = [
   {
@@ -11,7 +11,7 @@ export const geometry = [
     meta: 'Lintulahdenaukio, Helsinki',
     image: '/images/lintulahdenaukio.png',
     route: '/three/lintulahdenaukio',
-    blurb: 'Seven bronze geese on a patch of pavement, photographed from every angle a person can stand at.',
+    blurb: 'Seven bronze geese on a slab of pavement, photographed from all sides.',
   },
   {
     slug: 'trash',
@@ -19,7 +19,7 @@ export const geometry = [
     meta: 'Helsinki',
     image: '/images/trash.png',
     route: '/three/trash',
-    blurb: 'A city litter bin. Nobody has ever asked for a 3D model of one, which is most of the appeal.',
+    blurb: 'A street litter bin, scanned with the pavement and fence around it.',
   },
   {
     slug: 'snowman',
@@ -27,7 +27,7 @@ export const geometry = [
     meta: "Karhupuisto, Helsinki",
     image: '/images/snowman.png',
     route: '/three/snowman',
-    blurb: 'Built by strangers, scanned before it melted. The capture outlived the snow by a few days.',
+    blurb: 'Made by someone in the park over New Year, scanned before it melted.',
   },
   {
     slug: 'afx',
@@ -35,7 +35,7 @@ export const geometry = [
     meta: 'Record shelf',
     image: '/images/afx.png',
     route: '/three/afx',
-    blurb: 'The vinyl box set, scanned at home. Matte board and a debossed logo — a hard surface for photogrammetry.',
+    blurb: 'The vinyl box set, scanned at home on a desk.',
   },
   {
     slug: 'erzbrau',
@@ -43,7 +43,7 @@ export const geometry = [
     meta: 'Gaming, Austria',
     image: '/images/erzbrau.png',
     route: '/three/erzbrau',
-    blurb: 'A beer label peeled off a bottle and flattened out. Thin, creased, and barely there as geometry.',
+    blurb: 'A beer label taken off a bottle and flattened out.',
   },
   {
     slug: 'puzzle',
@@ -53,7 +53,7 @@ export const geometry = [
     image: '/images/puzzle.png',
     route: '/three/puzzle',
     bleed: true,
-    blurb: 'Interlocking pieces assembled from unit cubes. The source is editable in the page and rebuilds as you type.',
+    blurb: 'Interlocking pieces built from unit cubes. The source is editable in the page.',
   },
 ]
 
@@ -66,7 +66,7 @@ export const audio = [
     route: 'https://alejandro-p5-rnbo.vercel.app/sketches/mouse-theremin',
     external: true,
     bleed: true,
-    blurb: 'Move the pointer, bend the tone. The circle is the amplitude.',
+    blurb: 'Move the pointer to change the pitch. The circle shows the amplitude.',
   },
   {
     slug: 'ambient-generator',
@@ -75,7 +75,7 @@ export const audio = [
     image: '/images/ambient-generator.png',
     route: 'https://alejandro-p5-rnbo.vercel.app/sketches/ambient-generator',
     external: true,
-    blurb: 'A self-playing patch with pitch, filter and delay left out on the surface.',
+    blurb: 'A self-playing patch with pitch, filter and delay controls.',
   },
   {
     slug: 'piano-sketch',
@@ -84,7 +84,7 @@ export const audio = [
     image: '/images/piano.png',
     route: 'https://alejandro-p5-rnbo.vercel.app/sketches/piano-sketch',
     external: true,
-    blurb: 'Keys you can actually play, running on a sampler exported from Max.',
+    blurb: 'A playable keyboard running on a sampler exported from Max.',
   },
 ]
 
@@ -97,7 +97,7 @@ export const matrix = [
     route: cameraFeedbackKaleid,
     external: true,
     bleed: true,
-    blurb: 'The camera and the screen modulate each other until the feedback finds a shape.',
+    blurb: 'The camera and the screen modulate each other through kaleid and voronoi.',
   },
   {
     slug: 'p5-overlay',
@@ -107,7 +107,7 @@ export const matrix = [
     route: audioReactiveP5Overlay,
     external: true,
     bleed: true,
-    blurb: 'Typed phrases and slow doodles thrown over an FFT-modulated camera feed.',
+    blurb: 'Typed phrases and drawings over an FFT-modulated camera feed.',
   },
   {
     slug: 'bass-gated-scenes',
@@ -118,7 +118,7 @@ export const matrix = [
     external: true,
     bleed: true,
     blurb:
-      'A near-black field that never holds more than three things at once: a blob breathing on the low end, a hairline stepping on the beat, a strobe the bass opens. Switch SCENE from A to E and re-run to move through the set.',
+      'A black field with at most three elements: a blob, a line that steps on the beat, and a bass-gated strobe. Change SCENE from A to E and re-run to switch.',
   },
 ]
 
@@ -130,7 +130,7 @@ export const sections = [
     cordLabel: 'geometry',
     title: 'Objects',
     count: `${geometry.length} captures`,
-    lead: 'Things photographed on the street or on a shelf, rebuilt as meshes in RealityScan, and hung in a three.js viewport you can spin. The meshes are big and unoptimised, so the largest take the better part of a minute to arrive.',
+    lead: 'Objects photographed and rebuilt as meshes in RealityScan, shown in a three.js viewport you can drag. The files are large and unoptimised — the biggest take about a minute to load.',
     items: geometry,
   },
   {
@@ -139,7 +139,7 @@ export const sections = [
     cordLabel: 'audio signal',
     title: 'Patches on the web',
     count: `${audio.length} sketches`,
-    lead: 'Max/MSP patches exported through RNBO and wired into p5.js sketches. They run in the browser and start silent — every one waits for a click before it makes a sound.',
+    lead: 'Max/MSP patches exported with RNBO and wired to p5.js sketches. They run in the browser and start silent, so each one needs a click before it makes sound.',
     items: audio,
     link: { href: 'https://alejandro-p5-rnbo.vercel.app/', label: 'All p5 + RNBO sketches' },
   },
@@ -149,7 +149,7 @@ export const sections = [
     cordLabel: 'video matrix',
     title: 'Live coding',
     count: `${matrix.length} scripts`,
-    lead: 'Hydra scripts, shared as their own source. Opening one loads the code into hydra.ojack.xyz, already running, where you can rewrite it line by line.',
+    lead: 'Hydra scripts shared as their own source. Opening one loads the code into hydra.ojack.xyz, already running, so you can edit it there.',
     items: matrix,
   },
 ]

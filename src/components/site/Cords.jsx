@@ -1,5 +1,5 @@
 // The rail is a bundle of three cords leaving the hero's outlet. Each section
-// consumes one and the bundle thins as you scroll — the same way a patch reads.
+// consumes one, so the bundle thins as you scroll.
 
 export const CORDS = ['data', 'audio', 'matrix']
 
@@ -68,7 +68,7 @@ export function CordStub({ cord }) {
   return <span aria-hidden data-cord={cord} className='cord-tick block w-12 md:hidden' />
 }
 
-/** The key: which cord means what. Signposting, not ornament. */
+/** The key: which cord means what. */
 export function CordKey() {
   const legend = [
     { cord: 'data', label: 'geometry' },
@@ -76,12 +76,12 @@ export function CordKey() {
     { cord: 'matrix', label: 'video matrix' },
   ]
   return (
-    <dl className='t-mono flex flex-wrap items-center gap-x-7 gap-y-3 text-muted'>
+    <dl className='t-label flex flex-wrap items-center gap-x-7 gap-y-3 text-muted'>
       <dt className='sr-only'>Cord key</dt>
       {legend.map(({ cord, label }) => (
         <dd key={cord} className='flex items-center gap-2.5'>
           <span data-cord={cord} className='cord-tick block w-9' />
-          <span className='uppercase tracking-[0.14em]'>{label}</span>
+          <span>{label}</span>
         </dd>
       ))}
     </dl>

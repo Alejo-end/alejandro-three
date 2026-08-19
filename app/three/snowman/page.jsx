@@ -1,10 +1,7 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { ExhibitPage } from '@/components/site/ExhibitPage'
 import { ScanViewer } from '@/components/site/ScanViewer'
-
-const Scan = dynamic(() => import('@/components/canvas/Scan').then((mod) => mod.Scan), { ssr: false })
 
 export default function Page() {
   return (
@@ -16,12 +13,10 @@ export default function Page() {
         ['Method', 'RealityScan'],
         ['Mesh', 'OBJ + MTL, 105 MB'],
       ]}
-      lead={'Built by strangers in the park and scanned before it went. Snow is close to the worst possible subject for photogrammetry — white, soft, and featureless — so the surface is guesswork in places. The capture outlived the snowman by a few days.'}
-      note='Drag to turn it · scroll to zoom · two fingers to pan'
+      lead={'Made by someone in Karhupuisto over New Year and scanned before it melted. Snow is a hard subject — white and featureless — so parts of the surface are approximate.'}
+      note='Drag to rotate · scroll to zoom · two fingers to pan'
     >
-      <ScanViewer>
-        <Scan name='Snowman' />
-      </ScanViewer>
+      <ScanViewer name='Snowman' />
     </ExhibitPage>
   )
 }

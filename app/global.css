@@ -6,7 +6,6 @@
   :root {
     /* Patcher canvas. Cool sage neutral — the gray a scan gets rendered into. */
     --canvas: #d7d9d1;
-    --paper: #ecede7;
     --ink: #14171a;
     --muted: #545a53;
     --rule: #b4b8ad;
@@ -44,6 +43,8 @@
     font-family: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
     font-variation-settings: 'wdth' 100;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   ::selection {
@@ -59,38 +60,71 @@
 
 @layer components {
   /* ---- type roles -------------------------------------------------- */
+  /* Sizes are fluid so nothing jumps at a breakpoint, and each role carries
+     its own size: pages should not be picking arbitrary values. */
 
   /* Expanded grotesque. Reads like equipment silkscreen. */
   .t-display {
     font-family: var(--font-archivo), ui-sans-serif, sans-serif;
+    font-size: clamp(2.35rem, 1.15rem + 3.3vw, 3.9rem);
     font-variation-settings: 'wdth' 122;
     font-weight: 800;
-    letter-spacing: -0.02em;
-    line-height: 0.94;
+    letter-spacing: -0.022em;
+    line-height: 0.95;
     text-wrap: balance;
   }
 
-  .t-heading {
+  .t-title {
     font-family: var(--font-archivo), ui-sans-serif, sans-serif;
-    font-variation-settings: 'wdth' 118;
+    font-size: clamp(2rem, 1.25rem + 2.1vw, 3.05rem);
+    font-variation-settings: 'wdth' 119;
     font-weight: 700;
-    letter-spacing: -0.015em;
+    letter-spacing: -0.018em;
     line-height: 1;
+    text-wrap: balance;
   }
 
-  .t-mono {
-    font-family: var(--font-mono), ui-monospace, monospace;
-    font-weight: 400;
-    font-size: 0.6875rem;
-    letter-spacing: 0.02em;
-    line-height: 1.5;
+  .t-sub {
+    font-family: var(--font-archivo), ui-sans-serif, sans-serif;
+    font-size: 1.1rem;
+    font-variation-settings: 'wdth' 116;
+    font-weight: 700;
+    letter-spacing: -0.012em;
+    line-height: 1.15;
   }
 
   .t-body {
-    font-size: 1.0625rem;
+    font-size: clamp(1rem, 0.96rem + 0.16vw, 1.075rem);
     line-height: 1.55;
     letter-spacing: -0.005em;
-    max-width: 62ch;
+    max-width: 60ch;
+  }
+
+  .t-note {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    letter-spacing: -0.003em;
+  }
+
+  /* Every mono label shares one voice: same size, same tracking, lining
+     figures so columns of numbers line up. */
+  .t-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    line-height: 1.5;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  .t-label {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    line-height: 1.5;
+    text-transform: uppercase;
+    font-variant-numeric: tabular-nums lining-nums;
   }
 
   /* ---- cords ------------------------------------------------------- */

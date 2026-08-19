@@ -5,7 +5,6 @@ module.exports = {
     extend: {
       colors: {
         canvas: 'var(--canvas)',
-        paper: 'var(--paper)',
         ink: 'var(--ink)',
         muted: 'var(--muted)',
         rule: 'var(--rule)',

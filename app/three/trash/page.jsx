@@ -1,10 +1,7 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { ExhibitPage } from '@/components/site/ExhibitPage'
 import { ScanViewer } from '@/components/site/ScanViewer'
-
-const Scan = dynamic(() => import('@/components/canvas/Scan').then((mod) => mod.Scan), { ssr: false })
 
 export default function Page() {
   return (
@@ -15,12 +12,10 @@ export default function Page() {
         ['Method', 'RealityScan'],
         ['Mesh', 'OBJ + MTL, 26 MB'],
       ]}
-      lead={'A city litter bin, scanned in full. Nobody has ever asked for a 3D model of one, which is most of the appeal — and the ribbed metal gives photogrammetry something easy to hold on to.'}
-      note='Drag to turn it · scroll to zoom · two fingers to pan'
+      lead={'A street litter bin, scanned along with the pavement and the fence behind it. The ribbed metal gives photogrammetry plenty to match on.'}
+      note='Drag to rotate · scroll to zoom · two fingers to pan'
     >
-      <ScanViewer>
-        <Scan name='Trash_Can' />
-      </ScanViewer>
+      <ScanViewer name='Trash_Can' />
     </ExhibitPage>
   )
 }
