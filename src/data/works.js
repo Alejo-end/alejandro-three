@@ -1,4 +1,4 @@
-import { audioReactiveP5Overlay, cameraFeedbackKaleid } from './liveCoding'
+import { audioReactiveP5Overlay, bassGatedScenes, cameraFeedbackKaleid } from './liveCoding'
 
 // Every piece on the site, grouped by the kind of signal its cord carries.
 // `bleed` marks a thumbnail that fills its own frame (a screen); everything else
@@ -114,10 +114,11 @@ export const matrix = [
     title: 'Bass-gated scenes',
     meta: 'Wants a camera and a mic',
     image: '/images/hydra3.png',
+    route: bassGatedScenes,
+    external: true,
     bleed: true,
-    tag: 'Not shared yet',
     blurb:
-      'A near-black field with at most three things on it at once: a blob that breathes on the low end, a hairline that steps on the beat, and a strobe the bass opens.',
+      'A near-black field that never holds more than three things at once: a blob breathing on the low end, a hairline stepping on the beat, a strobe the bass opens. Switch SCENE from A to E and re-run to move through the set.',
   },
 ]
 
