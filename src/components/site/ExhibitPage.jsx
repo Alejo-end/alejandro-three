@@ -20,23 +20,18 @@ function LoadReadout() {
   )
 }
 
-/**
- * The shell every piece's page shares. The viewer fills the window and the
- * notes sit over it, so the whole page is a surface you can drag.
- */
+/** The shell every piece's page shares: capture notes beside a viewer panel. */
 export function ExhibitPage({ title, meta, lead, note, showProgress = true, children }) {
   return (
     <>
-      {children}
+      <SiteHeader />
 
-      <div className='pointer-events-none relative'>
-        <SiteHeader />
-
-        <div className='mx-auto max-w-patch px-6 pb-16 md:px-10'>
-          <div className='max-w-[25rem] md:pl-rail'>
+      <div className='mx-auto max-w-patch px-6 pb-20 md:px-10'>
+        <div className='gap-12 lg:grid lg:grid-cols-[minmax(0,23rem)_minmax(0,1fr)]'>
+          <div className='max-w-[26rem] md:pl-rail'>
             <Link
               href='/'
-              className='t-label group pointer-events-auto inline-flex items-center gap-3 text-muted transition-colors hover:text-ink'
+              className='t-label group inline-flex items-center gap-3 text-muted transition-colors hover:text-ink'
             >
               <span
                 aria-hidden
@@ -65,6 +60,8 @@ export function ExhibitPage({ title, meta, lead, note, showProgress = true, chil
 
             {note && <p className='t-label mt-5 text-muted'>{note}</p>}
           </div>
+
+          <div className='mt-12 lg:mt-0'>{children}</div>
         </div>
       </div>
     </>

@@ -13,7 +13,6 @@ export default function Page() {
         ['Mesh', 'OBJ + MTL, 120 MB'],
       ]}
       lead={'Seven bronze geese on a slab of pavement, photographed from every side you can reach on foot. The back of the plinth is thin because there was nowhere to stand.'}
-      note='Drag to rotate · scroll to zoom · two fingers to pan'
     >
       <ScanViewer name='Lintulahdenaukio' />
     </ExhibitPage>

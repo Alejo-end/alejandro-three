@@ -14,7 +14,6 @@ export default function Page() {
         ['Mesh', 'OBJ + MTL, 105 MB'],
       ]}
       lead={'Made by someone in Karhupuisto over New Year and scanned before it melted. Snow is a hard subject — white and featureless — so parts of the surface are approximate.'}
-      note='Drag to rotate · scroll to zoom · two fingers to pan'
     >
       <ScanViewer name='Snowman' />
     </ExhibitPage>

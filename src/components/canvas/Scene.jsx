@@ -8,7 +8,11 @@ import * as THREE from 'three'
 export default function Scene({ ...props }) {
   // Everything defined in here will persist between route changes, only children are swapped
   return (
-    <Canvas {...props}
+    <Canvas
+      {...props}
+      // Retina doubles every dimension, so an uncapped ratio asks the GPU for
+      // four times the fragments. 1.5 is the point where more stops showing.
+      dpr={[1, 1.5]}
       onCreated={(state) => (state.gl.toneMapping = THREE.AgXToneMapping)}
     >
       {/* @ts-ignore */}

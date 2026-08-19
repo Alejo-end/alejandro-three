@@ -13,7 +13,6 @@ export default function Page() {
         ['Mesh', 'OBJ + MTL, 24 MB'],
       ]}
       lead={'A beer label taken off a bottle and flattened out. There is almost no depth to it, so most of the detail is in the texture rather than the mesh.'}
-      note='Drag to rotate · scroll to zoom · two fingers to pan'
     >
       <ScanViewer name='Erzbrau' />
     </ExhibitPage>
