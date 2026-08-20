@@ -99,20 +99,24 @@ function pack({ px, uv, corners }) {
 }
 
 function encode({ count, min, size, qPos, qUv, indices }) {
-  const header = Buffer.from(
-    JSON.stringify({ version: 1, count, indexCount: indices.length, min, size }),
-    'utf8',
-  )
-  const pad = (4 - (header.length % 4)) % 4
-  const out = Buffer.alloc(8 + header.length + pad + qPos.byteLength + qUv.byteLength + indices.byteLength)
+  // Padded with spaces, not zeros: the reader decodes the whole padded span and
+  // JSON.parse tolerates trailing whitespace but not trailing NULs.
+  let json = JSON.stringify({ version: 2, count, indexCount: indices.length, min, size })
+  while (json.length % 4) json += ' '
+  const header = Buffer.from(json, 'utf8')
+
+  // Indices go first. They are the only 4-byte-wide buffer, so putting them
+  // immediately after the 4-aligned header keeps every view aligned no matter
+  // whether the vertex count is odd or even.
+  const out = Buffer.alloc(8 + header.length + indices.byteLength + qPos.byteLength + qUv.byteLength)
 
   let at = 0
   out.writeUInt32LE(MAGIC, at); at += 4
-  out.writeUInt32LE(header.length + pad, at); at += 4
-  header.copy(out, at); at += header.length + pad
+  out.writeUInt32LE(header.length, at); at += 4
+  header.copy(out, at); at += header.length
+  Buffer.from(indices.buffer, indices.byteOffset, indices.byteLength).copy(out, at); at += indices.byteLength
   Buffer.from(qPos.buffer, qPos.byteOffset, qPos.byteLength).copy(out, at); at += qPos.byteLength
-  Buffer.from(qUv.buffer, qUv.byteOffset, qUv.byteLength).copy(out, at); at += qUv.byteLength
-  Buffer.from(indices.buffer, indices.byteOffset, indices.byteLength).copy(out, at)
+  Buffer.from(qUv.buffer, qUv.byteOffset, qUv.byteLength).copy(out, at)
   return out
 }
 

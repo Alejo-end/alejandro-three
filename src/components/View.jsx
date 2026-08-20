@@ -22,6 +22,7 @@ export const Rig = ({ position }) => (
 const View = forwardRef(({ children, orbit, ...props }, ref) => {
   const localRef = useRef(null)
   useImperativeHandle(ref, () => localRef.current)
+  if (typeof window !== 'undefined') (window.__log ||= []).push('view-wrapper')
 
   return (
     <>

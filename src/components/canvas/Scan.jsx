@@ -101,6 +101,7 @@ const vertexShader = /* glsl */ `
   attribute vec3 aDir;
   attribute float aSeed;
   uniform vec3 uPointer;
+  uniform vec3 uProportion;
   uniform float uRadius;
   uniform float uStrength;
   uniform float uSize;
@@ -109,10 +110,20 @@ const vertexShader = /* glsl */ `
 
   void main() {
     vUv = uv;
-    float reach = 1.0 - smoothstep(uRadius * 0.12, uRadius, distance(position, uPointer));
+
+    // Grains live in the quantised unit cube, which the mesh then scales by its
+    // real proportions. Both the reach and the travel are corrected by those
+    // proportions, so a flat object scatters as far across its thin axis as a
+    // tall one does across its long one.
+    float reach = 1.0 - smoothstep(
+      uRadius * 0.12,
+      uRadius,
+      length((position - uPointer) * uProportion)
+    );
     float influence = reach * uStrength;
 
-    vec4 mv = modelViewMatrix * vec4(position + aDir * influence * 0.22, 1.0);
+    vec3 travel = aDir / uProportion * influence * 0.2;
+    vec4 mv = modelViewMatrix * vec4(position + travel, 1.0);
     vAlpha = influence;
     gl_PointSize = influence < 0.015 ? 0.0 : clamp(uSize * (300.0 / max(0.001, -mv.z)), 1.0, 3.5);
     gl_Position = projectionMatrix * mv;
@@ -138,11 +149,12 @@ const fragmentShader = /* glsl */ `
  * is drawn unlit: no lights, no normals, no normal map, and the capture reads
  * exactly as it was photographed.
  */
-export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
+export function Scan({ name, mode = 'lift', pointer, fill = 0.74, onState, ...props }) {
+  if (typeof window !== 'undefined') (window.__log ||= []).push('scan-body')
   const camera = useThree((state) => state.camera)
   const size = useThree((state) => state.size)
   const [scan, setScan] = useState(null)
-  const grainNode = useRef(null)
+  const frame = useRef(null)
 
   const map = useMemo(() => {
     const texture = new TextureLoader().load(`/scans/${name}/albedo.jpg`)
@@ -156,25 +168,24 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
     let stale = false
     loadScan(`/scans/${name}/mesh.bin`, abort.signal)
       .then((result) => {
-        if (!stale) setScan(result)
+        if (stale) return
+        setScan(result)
+        onState?.('ready')
       })
       .catch((error) => {
-        if (error.name !== 'AbortError') console.error(error)
+        if (error.name === 'AbortError') return
+        console.error(error)
+        onState?.('failed')
       })
     return () => {
       stale = true
       abort.abort()
     }
-  }, [name])
-
-  useEffect(() => () => map.dispose(), [map])
-  useEffect(() => () => scan?.geometry.dispose(), [scan])
+  }, [name, onState])
 
   const surface = useMemo(() => new MeshBasicMaterial({ map }), [map])
-  useEffect(() => () => surface.dispose(), [surface])
 
   const grains = useMemo(() => (scan ? buildGrains(scan.geometry, mode) : null), [scan, mode])
-  useEffect(() => () => grains?.dispose(), [grains])
 
   const grainMaterial = useMemo(
     () =>
@@ -182,7 +193,8 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
         uniforms: {
           uMap: { value: map },
           uPointer: { value: new Vector3(0.5, 0.5, 0.5) },
-          uRadius: { value: 0.3 },
+          uProportion: { value: new Vector3(1, 1, 1) },
+          uRadius: { value: 0.34 },
           uStrength: { value: 0 },
           uSize: { value: 1.7 },
         },
@@ -193,7 +205,30 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
       }),
     [map],
   )
-  useEffect(() => () => grainMaterial.dispose(), [grainMaterial])
+
+  // React runs every effect twice on mount in StrictMode, so the usual
+  // `useEffect(() => () => thing.dispose(), [thing])` throws the texture and
+  // the material away the instant they are made and the mesh renders as
+  // nothing. Disposal waits a microtask and bails if we were re-mounted.
+  const mounted = useRef(false)
+  const live = useRef(null)
+  live.current = { map, surface, grainMaterial, geometry: scan?.geometry, grains }
+
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      const doomed = live.current
+      queueMicrotask(() => {
+        if (mounted.current) return
+        doomed.map?.dispose()
+        doomed.surface?.dispose()
+        doomed.grainMaterial?.dispose()
+        doomed.geometry?.dispose()
+        doomed.grains?.dispose()
+      })
+    }
+  }, [])
 
   const rig = useMemo(
     () => ({
@@ -209,8 +244,22 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
   )
 
   useFrame((_, delta) => {
-    const node = grainNode.current
-    if (!node || !pointer) return
+    const node = frame.current
+    if (typeof window !== 'undefined') {
+      window.__u = { frames: (window.__u?.frames || 0) + 1, node: !!node, scan: !!scan,
+        active: pointer?.current?.active, ndc: pointer?.current && [pointer.current.x, pointer.current.y],
+        strength: +grainMaterial.uniforms.uStrength.value.toFixed(3),
+        ptr: grainMaterial.uniforms.uPointer.value.toArray().map(v => +v.toFixed(3)),
+        grains: grains?.getAttribute('position')?.count ?? null }
+    }
+    if (!node || !pointer || !scan) return
+
+    const longest = Math.max(scan.size[0], scan.size[1], scan.size[2])
+    grainMaterial.uniforms.uProportion.value.set(
+      scan.size[0] / longest,
+      scan.size[1] / longest,
+      scan.size[2] / longest,
+    )
 
     const { active, x, y } = pointer.current
     const uniforms = grainMaterial.uniforms
@@ -245,9 +294,11 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, ...props }) {
 
   return (
     <group scale={scale} {...props}>
-      <group position={centre} scale={scan.size}>
+      {/* The pointer is resolved against this group, not the points: it exists
+          from the first frame, and its local space is the same unit cube. */}
+      <group ref={frame} position={centre} scale={scan.size}>
         <mesh geometry={scan.geometry} material={surface} frustumCulled={false} />
-        <points ref={grainNode} geometry={grains} material={grainMaterial} frustumCulled={false} />
+        {grains && <points geometry={grains} material={grainMaterial} frustumCulled={false} />}
       </group>
     </group>
   )

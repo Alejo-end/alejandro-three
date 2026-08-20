@@ -28,15 +28,17 @@ export async function loadScan(url, signal) {
   if (head.getUint32(0, true) !== MAGIC) throw new Error(`${url} is not a packed scan`)
 
   const headerLength = head.getUint32(4, true)
-  const header = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 8, headerLength)))
+  const header = JSON.parse(new TextDecoder().decode(new Uint8Array(buffer, 8, headerLength)).trim())
   const { count, indexCount, min, size } = header
 
+  // Indices first: they are the only 4-byte-wide buffer, so reading them off the
+  // 4-aligned header keeps the u16 views that follow aligned for any count.
   let at = 8 + headerLength
+  const indices = new Uint32Array(buffer, at, indexCount)
+  at += indices.byteLength
   const positions = new Uint16Array(buffer, at, count * 3)
   at += positions.byteLength
   const uvs = new Uint16Array(buffer, at, count * 2)
-  at += uvs.byteLength
-  const indices = new Uint32Array(buffer, at, indexCount)
 
   const geometry = new BufferGeometry()
   geometry.setAttribute('position', new BufferAttribute(positions, 3, true))

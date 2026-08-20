@@ -14,7 +14,6 @@ export default function Page() {
       lead={
         'Interlocking pieces built from unit cubes that fit together into one solid cube. The editor runs the real source, so changing a line rebuilds the preview.'
       }
-      showProgress={false}
       note='Edit the source on the left · the preview rebuilds'
     >
       <iframe

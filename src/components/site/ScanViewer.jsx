@@ -1,11 +1,19 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { Suspense, useEffect, useRef } from 'react'
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
+import { Scan } from '@/components/canvas/Scan'
 
+// Only the pieces that touch the WebGL context are deferred; Scan is imported
+// directly. Every extra dynamic boundary is another chunk that can go stale.
 const View = dynamic(() => import('@/components/View').then((mod) => mod.View), { ssr: false })
 const Rig = dynamic(() => import('@/components/View').then((mod) => mod.Rig), { ssr: false })
-const Scan = dynamic(() => import('@/components/canvas/Scan').then((mod) => mod.Scan), { ssr: false })
+
+const STATE_TEXT = {
+  loading: 'Loading mesh',
+  ready: 'Move across it to disturb the surface · drag to rotate',
+  failed: 'The mesh did not load — reload the page to try again',
+}
 
 /**
  * A bounded viewport for one scanned mesh. The box is deliberately small: the
@@ -19,8 +27,12 @@ const Scan = dynamic(() => import('@/components/canvas/Scan').then((mod) => mod.
  */
 export function ScanViewer({ name, mode, rotation }) {
   const box = useRef(null)
+  const [state, setState] = useState('loading')
   // A ref, not state: this updates on every pointer move and must not re-render.
   const pointer = useRef({ active: false, x: 0, y: 0 })
+
+  // Stable, so it never re-triggers the loader effect that depends on it.
+  const onState = useCallback((next) => setState(next), [])
 
   useEffect(() => {
     // Listening on the window rather than the panel: OrbitControls captures the
@@ -56,15 +68,18 @@ export function ScanViewer({ name, mode, rotation }) {
       <div ref={box} className='relative h-[48vh] max-h-[28rem] min-h-[16rem] w-full touch-none'>
         <View orbit className='absolute inset-0'>
           <Suspense fallback={null}>
-            <Scan name={name} mode={mode} rotation={rotation} pointer={pointer} />
+            <Scan name={name} mode={mode} rotation={rotation} pointer={pointer} onState={onState} />
             <Rig position={[3.2, 2.5, 4.4]} />
           </Suspense>
         </View>
       </div>
 
-      <figcaption className='t-label mt-4 border-t border-rule pt-3 text-muted'>
-        Move across it to disturb the surface · drag to rotate
-      </figcaption>
+      <div className='mt-4 border-t border-rule pt-3'>
+        {state === 'loading' && <div aria-hidden className='loading-run mb-2 w-full' />}
+        <figcaption className='t-label text-muted' role='status'>
+          {STATE_TEXT[state]}
+        </figcaption>
+      </div>
     </figure>
   )
 }
