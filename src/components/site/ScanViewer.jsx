@@ -4,13 +4,14 @@ import dynamic from 'next/dynamic'
 import { Suspense, useEffect, useRef } from 'react'
 
 const View = dynamic(() => import('@/components/View').then((mod) => mod.View), { ssr: false })
-const Common = dynamic(() => import('@/components/View').then((mod) => mod.Common), { ssr: false })
+const Rig = dynamic(() => import('@/components/View').then((mod) => mod.Rig), { ssr: false })
 const Scan = dynamic(() => import('@/components/canvas/Scan').then((mod) => mod.Scan), { ssr: false })
 
 /**
  * A bounded viewport for one scanned mesh. The box is deliberately small: the
  * renderer only draws the scissored region, so a modest panel costs a fraction
- * of a full-window canvas.
+ * of a full-window canvas. No lights are set up — these captures carry their
+ * own baked lighting and are drawn unlit.
  *
  * The scatter follows the cursor and there is no mode to switch on. Grains lift
  * off wherever you point and settle back behind you, so the surface is only
@@ -56,7 +57,7 @@ export function ScanViewer({ name, mode, rotation }) {
         <View orbit className='absolute inset-0'>
           <Suspense fallback={null}>
             <Scan name={name} mode={mode} rotation={rotation} pointer={pointer} />
-            <Common position={[3.2, 2.5, 4.4]} />
+            <Rig position={[3.2, 2.5, 4.4]} />
           </Suspense>
         </View>
       </div>

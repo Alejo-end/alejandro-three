@@ -10,7 +10,8 @@ export default function Page() {
       meta={[
         ['Found', 'Gaming, Austria'],
         ['Method', 'RealityScan'],
-        ['Mesh', 'OBJ + MTL, 24 MB'],
+        ['Mesh', '172k triangles'],
+        ['Payload', '3.2 MB'],
       ]}
       lead={'A beer label taken off a bottle and flattened out. There is almost no depth to it, so most of the detail is in the texture rather than the mesh.'}
     >

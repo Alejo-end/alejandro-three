@@ -10,7 +10,8 @@ export default function Page() {
       meta={[
         ['Found', 'Lintulahdenaukio, Helsinki'],
         ['Method', 'RealityScan'],
-        ['Mesh', 'OBJ + MTL, 120 MB'],
+        ['Mesh', '1.0M triangles'],
+        ['Payload', '17 MB'],
       ]}
       lead={'Seven bronze geese on a slab of pavement, photographed from every side you can reach on foot. The back of the plinth is thin because there was nowhere to stand.'}
     >

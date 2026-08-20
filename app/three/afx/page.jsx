@@ -10,7 +10,8 @@ export default function Page() {
       meta={[
         ['Found', 'A record shelf'],
         ['Method', 'RealityScan'],
-        ['Mesh', 'OBJ + MTL, 28 MB'],
+        ['Mesh', '100k triangles'],
+        ['Payload', '2.5 MB'],
       ]}
       lead={'The vinyl box set, scanned at home on a desk. Matte board and a debossed logo, both low in contrast.'}
     >

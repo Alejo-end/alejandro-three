@@ -10,7 +10,8 @@ export default function Page() {
       meta={[
         ['Found', 'A street in Helsinki'],
         ['Method', 'RealityScan'],
-        ['Mesh', 'OBJ + MTL, 26 MB'],
+        ['Mesh', '163k triangles'],
+        ['Payload', '3.4 MB'],
       ]}
       lead={'A street litter bin, scanned along with the pavement and the fence behind it. The ribbed metal gives photogrammetry plenty to match on.'}
     >

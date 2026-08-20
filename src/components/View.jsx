@@ -14,6 +14,11 @@ export const Common = ({ color, position }) => (
   </Suspense>
 )
 
+/** Camera only. Scans are drawn unlit, so they need no lights at all. */
+export const Rig = ({ position }) => (
+  <PerspectiveCamera makeDefault fov={40} position={position || [0, 0, 6]} />
+)
+
 const View = forwardRef(({ children, orbit, ...props }, ref) => {
   const localRef = useRef(null)
   useImperativeHandle(ref, () => localRef.current)

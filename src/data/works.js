@@ -130,7 +130,7 @@ export const sections = [
     cordLabel: 'geometry',
     title: 'Objects',
     count: `${geometry.length} captures`,
-    lead: 'Objects photographed and rebuilt as meshes in RealityScan, shown in a three.js viewport you can drag. The files are large and unoptimised — the biggest take about a minute to load.',
+    lead: 'Objects photographed and rebuilt as meshes in RealityScan, shown in a three.js viewport you can drag. Point at one and the surface comes apart under the cursor.',
     items: geometry,
   },
   {

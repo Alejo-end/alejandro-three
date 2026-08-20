@@ -61,7 +61,14 @@ export function ExhibitPage({ title, meta, lead, note, showProgress = true, chil
             {note && <p className='t-label mt-5 text-muted'>{note}</p>}
           </div>
 
-          <div className='mt-12 lg:mt-0'>{children}</div>
+          <div className='relative mt-12 lg:mt-0'>
+            {/* The cord that feeds this viewport, same taxonomy as the index. */}
+            <span aria-hidden className='absolute right-full top-28 hidden w-12 items-center lg:flex'>
+              <span data-cord='data' className='cord-tick w-full' />
+            </span>
+            <span aria-hidden className='nub absolute left-0 top-28 hidden h-[15px] w-[5px] -translate-y-1/2 lg:block' />
+            {children}
+          </div>
         </div>
       </div>
     </>
