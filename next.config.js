@@ -6,9 +6,16 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
  * A fork of 'next-pwa' that has app directory support
  * @see https://github.com/shadowwalker/next-pwa/issues/424#issuecomment-1332258575
  */
+/**
+ * Service worker off. Its generated precache manifest pins exact asset paths,
+ * so moving the raw captures out of public/ left an install that could never
+ * succeed, and its CacheFirst rule kept handing browsers files that no longer
+ * matched the code. A portfolio gains nothing from offline caching that is
+ * worth that failure mode.
+ */
 const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
-  disable: process.env.NODE_ENV === 'development',
+  disable: true,
 })
 
 const nextConfig = {

@@ -101,7 +101,6 @@ const vertexShader = /* glsl */ `
   attribute vec3 aDir;
   attribute float aSeed;
   uniform vec3 uPointer;
-  uniform vec3 uProportion;
   uniform float uRadius;
   uniform float uStrength;
   uniform float uSize;
@@ -111,18 +110,14 @@ const vertexShader = /* glsl */ `
   void main() {
     vUv = uv;
 
-    // Grains live in the quantised unit cube, which the mesh then scales by its
-    // real proportions. Both the reach and the travel are corrected by those
-    // proportions, so a flat object scatters as far across its thin axis as a
-    // tall one does across its long one.
-    float reach = 1.0 - smoothstep(
-      uRadius * 0.12,
-      uRadius,
-      length((position - uPointer) * uProportion)
-    );
+    // Everything is measured in the quantised unit cube the mesh lives in, so
+    // the reach and the travel are both plain fractions of the model's size.
+    // Correcting them by the model's proportions was worth a look, but on a
+    // flat object it multiplied travel by nine and threw the grains off screen.
+    float reach = 1.0 - smoothstep(uRadius * 0.15, uRadius, distance(position, uPointer));
     float influence = reach * uStrength;
 
-    vec3 travel = aDir / uProportion * influence * 0.2;
+    vec3 travel = aDir * influence * 0.16;
     vec4 mv = modelViewMatrix * vec4(position + travel, 1.0);
     vAlpha = influence;
     gl_PointSize = influence < 0.015 ? 0.0 : clamp(uSize * (300.0 / max(0.001, -mv.z)), 1.0, 3.5);
@@ -150,7 +145,6 @@ const fragmentShader = /* glsl */ `
  * exactly as it was photographed.
  */
 export function Scan({ name, mode = 'lift', pointer, fill = 0.74, onState, ...props }) {
-  if (typeof window !== 'undefined') (window.__log ||= []).push('scan-body')
   const camera = useThree((state) => state.camera)
   const size = useThree((state) => state.size)
   const [scan, setScan] = useState(null)
@@ -193,8 +187,7 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, onState, ...pr
         uniforms: {
           uMap: { value: map },
           uPointer: { value: new Vector3(0.5, 0.5, 0.5) },
-          uProportion: { value: new Vector3(1, 1, 1) },
-          uRadius: { value: 0.34 },
+          uRadius: { value: 0.42 },
           uStrength: { value: 0 },
           uSize: { value: 1.7 },
         },
@@ -245,21 +238,7 @@ export function Scan({ name, mode = 'lift', pointer, fill = 0.74, onState, ...pr
 
   useFrame((_, delta) => {
     const node = frame.current
-    if (typeof window !== 'undefined') {
-      window.__u = { frames: (window.__u?.frames || 0) + 1, node: !!node, scan: !!scan,
-        active: pointer?.current?.active, ndc: pointer?.current && [pointer.current.x, pointer.current.y],
-        strength: +grainMaterial.uniforms.uStrength.value.toFixed(3),
-        ptr: grainMaterial.uniforms.uPointer.value.toArray().map(v => +v.toFixed(3)),
-        grains: grains?.getAttribute('position')?.count ?? null }
-    }
     if (!node || !pointer || !scan) return
-
-    const longest = Math.max(scan.size[0], scan.size[1], scan.size[2])
-    grainMaterial.uniforms.uProportion.value.set(
-      scan.size[0] / longest,
-      scan.size[1] / longest,
-      scan.size[2] / longest,
-    )
 
     const { active, x, y } = pointer.current
     const uniforms = grainMaterial.uniforms
