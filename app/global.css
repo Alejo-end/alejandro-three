@@ -1,6 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Tailwind 4 keeps its design tokens in CSS. These map the Tailwind
+   namespaces onto the palette defined in :root below, so `text-ink`,
+   `w-rail` and friends keep resolving to the same values they always did. */
+@theme {
+  --color-canvas: var(--canvas);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-audio: var(--audio);
+  --color-matrix: var(--matrix);
+
+  --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-martian), ui-monospace, monospace;
+
+  --spacing-rail: var(--rail);
+  --container-patch: 78rem;
+}
 
 @layer base {
   :root {
@@ -109,7 +125,7 @@
   /* Every mono label shares one voice: same size, same tracking, lining
      figures so columns of numbers line up. */
   .t-mono {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-martian), ui-monospace, monospace;
     font-size: 0.6875rem;
     font-weight: 400;
     letter-spacing: 0.06em;
@@ -118,7 +134,7 @@
   }
 
   .t-label {
-    font-family: var(--font-mono), ui-monospace, monospace;
+    font-family: var(--font-martian), ui-monospace, monospace;
     font-size: 0.6875rem;
     font-weight: 400;
     letter-spacing: 0.14em;

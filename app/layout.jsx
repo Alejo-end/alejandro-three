@@ -18,7 +18,7 @@ const martianMono = localFont({
     { path: '../public/fonts/martianmono-latin-ext.woff2', weight: '100 800', style: 'normal' },
   ],
   display: 'swap',
-  variable: '--font-mono',
+  variable: '--font-martian',
 })
 
 export const metadata = {
