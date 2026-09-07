@@ -53,7 +53,7 @@ export const geometry = [
     image: '/images/puzzle.png',
     route: '/three/puzzle',
     bleed: true,
-    blurb: 'Interlocking pieces built from unit cubes. The source is editable in the page.',
+    blurb: 'Interlocking pieces built from small cubes. You can edit the code on the page.',
   },
 ]
 
@@ -84,20 +84,20 @@ export const audio = [
     image: '/images/piano.png',
     route: 'https://alejandro-p5-rnbo.vercel.app/sketches/piano-sketch',
     external: true,
-    blurb: 'A playable keyboard running on a sampler exported from Max.',
+    blurb: 'A playable keyboard running on sampled notes.',
   },
 ]
 
 export const matrix = [
   {
     slug: 'camera-feedback',
-    title: 'Camera feedback, kaleid',
+    title: 'Camera feedback',
     meta: 'Wants a camera',
     image: '/images/hydra.png',
     route: cameraFeedbackKaleid,
     external: true,
     bleed: true,
-    blurb: 'The camera and the screen modulate each other through kaleid and voronoi.',
+    blurb: 'The camera and the screen feed back into each other, tiled and pulled out of shape.',
   },
   {
     slug: 'p5-overlay',
@@ -107,18 +107,18 @@ export const matrix = [
     route: audioReactiveP5Overlay,
     external: true,
     bleed: true,
-    blurb: 'Typed phrases and drawings over an FFT-modulated camera feed.',
+    blurb: 'Typed phrases and drawings over a camera feed that moves with the sound.',
   },
   {
     slug: 'bass-gated-scenes',
-    title: 'Bass-gated scenes',
+    title: 'Scenes that follow the bass',
     meta: 'Wants a camera and a mic',
     image: '/images/hydra3.png',
     route: bassGatedScenes,
     external: true,
     bleed: true,
     blurb:
-      'A black field with at most three elements: a blob, a line that steps on the beat, and a bass-gated strobe. Change SCENE from A to E and re-run to switch.',
+      'A black field with at most three things in it: a blob, a line that steps on the beat, and a strobe that fires on the low end. Change SCENE from A to E and run it again to switch.',
   },
 ]
 
@@ -130,7 +130,7 @@ export const sections = [
     cordLabel: 'geometry',
     title: 'Objects',
     count: `${geometry.length} captures`,
-    lead: 'Objects photographed and rebuilt as meshes in RealityScan, shown in a three.js viewport you can drag. Point at one and the surface comes apart under the cursor.',
+    lead: 'Things I photographed from every side, then rebuilt as models you can turn around. Point at one and its surface breaks apart under the cursor.',
     items: geometry,
   },
   {
@@ -139,9 +139,9 @@ export const sections = [
     cordLabel: 'audio signal',
     title: 'Patches on the web',
     count: `${audio.length} sketches`,
-    lead: 'Max/MSP patches exported with RNBO and wired to p5.js sketches. They run in the browser and start silent, so each one needs a click before it makes sound.',
+    lead: 'Small instruments that run in the page and make sound as you move or type. Each one starts silent, so click before you expect to hear anything.',
     items: audio,
-    link: { href: 'https://alejandro-p5-rnbo.vercel.app/', label: 'All p5 + RNBO sketches' },
+    link: { href: 'https://alejandro-p5-rnbo.vercel.app/', label: 'All the sketches' },
   },
   {
     id: 'matrix',
@@ -149,7 +149,7 @@ export const sections = [
     cordLabel: 'video matrix',
     title: 'Live coding',
     count: `${matrix.length} scripts`,
-    lead: 'Hydra scripts shared as their own source. Opening one loads the code into hydra.ojack.xyz, already running, so you can edit it there.',
+    lead: 'Moving images written as a few lines of code. Opening one drops you into an editor with it already running, so you can change it and watch what happens.',
     items: matrix,
   },
 ]
