@@ -28,13 +28,11 @@ export default function Page() {
           <div className='relative md:pl-rail'>
             <p className='t-label mb-7 text-muted'>Captures, patches, live code</p>
 
-            <h1 className='t-display'>
-              Things I scanned, patches I built, code I left running.
-            </h1>
+            <h1 className='t-display'>Objects off the street, rebuilt as meshes.</h1>
 
             <p className='t-body mt-7 max-w-[34rem] text-muted'>
-              Photogrammetry scans of objects from Helsinki and Austria, Max patches running in the browser through
-              RNBO, and Hydra scripts you can open and edit. Everything here is clickable.
+              Photogrammetry from Helsinki and Austria. Max patches running in the browser through RNBO. Hydra scripts
+              you can rewrite. All of it is live.
             </p>
 
             <div className='mt-9 max-w-[34rem] border-t border-rule pt-5'>
