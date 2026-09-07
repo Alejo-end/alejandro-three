@@ -154,10 +154,10 @@
     width: var(--cord-w);
   }
 
-  /* A message cord is thinner and uncoloured, but it carries signal too, so it
-     runs with the same rhythm as the other two. */
+  /* The black cord is uncoloured but carries signal like the other two, so it
+     runs at the same weight and rhythm. */
   .cord-run[data-cord='data'] {
-    width: 3px;
+    width: var(--cord-w);
     background-color: var(--data);
     background-image: repeating-linear-gradient(
       to bottom,
@@ -189,7 +189,7 @@
 
   /* The short horizontal run from the rail into a section's inlet. */
   .cord-tick[data-cord='data'] {
-    height: 3px;
+    height: var(--cord-w);
     background-color: var(--data);
     background-image: repeating-linear-gradient(
       to right,
